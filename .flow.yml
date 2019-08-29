@@ -1,0 +1,11 @@
+---
+default:
+        cmd: | #/usr/bin/env bash
+
+
+                clear
+
+                cd ~/code/std
+
+                go build .
+                ./std rename 
