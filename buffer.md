@@ -21,6 +21,8 @@
 	What if you built something that could listen to the professor and as it does it takes notes down of what they say 
 	Make your CLI for sending messages
 	Make a CLI about URL Shortening 
+
+
 #Start of school year 
 	Look through the parts of the CAIS curriculum 
 	Go through the rest of the curriculum for python so you can get started on the pytorch course 
