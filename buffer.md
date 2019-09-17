@@ -1,28 +1,33 @@
-# school
+# General
 
-#ITP104
-
-#Calc3
+	Go back to the career center and get the following things down
+		How to get more connected withe mentorship progam  	
 	
-	Try and get transfered into Neal's class
-	Homework and quiz due on thursday 
+	Go on connectsc and get the internships!!
+	Student Health Plan needs to be waived as soon as possible
+	Get the housing taken care of	
 
-#CSCI 170 
+# Tonight		
+
+	Get HTML Project finished
+	Get the Backlog repo finished 
+	Get the 
+
+# Find new housing		
 	
-	Need to get the online book 
-	Read chapters 1,5,6
+	http://stuho.com/Details.aspx?id=1	
+	http://stuho.com/USC-Student-Housing.aspx?rentmin=&rentmax=&beds=&typespace=-1	
 
-#CSCI 104
+# Communication
 
-	Lab 0 and 1
-		
+	Get in contact with the people at microsoft and thank them for their time 
+	Do the code interview for the game studio
+	Get in contact with diversity office about events for students that are diverse
 
 
-	
-#RXRS
+# Tesla
 
-	
-	You signed up for week 13, 2,3,4 for essays
-	Buy the book
+	Keep in touch with Elizabeth. She is cool 
+	Get some more shit rolled out on your github. Be a true Golang engineer
 
-# Hit MQ when you are finished
+# When you are finished hit MQ

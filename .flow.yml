@@ -5,7 +5,7 @@ default:
 
                 clear
 
-                cd ~/code/std
+                cd ~/repositories/std
 
                 go build .
                 ./std rename 

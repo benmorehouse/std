@@ -321,6 +321,7 @@ var renameList = &cobra.Command{
 	},
 }
 
+
 var welcome = &cobra.Command{ // appends to the end of the bucket
 // store some data that is written by the user
 	Use: "welcome",
