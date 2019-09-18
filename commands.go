@@ -33,6 +33,11 @@ var writeList = &cobra.Command{ // appends to the end of the bucket
 			temp = args[0]
 		}
 		temp = strings.ToLower(strings.TrimSpace(temp))
+		if temp == "backlog"{
+			db.Close()
+			run_backlog()
+			return
+		}
 		chosen_list_key := []byte(temp)
 		err = db.Update(func(tx *bolt.Tx) error{
 			bucket := tx.Bucket(bucketName)
