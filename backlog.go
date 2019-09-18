@@ -1,6 +1,6 @@
 package main
 
-import (
+import(
 	"github.com/spf13/cobra"
 	"github.com/boltdb/bolt"
 	"fmt"
@@ -8,18 +8,14 @@ import (
 	"os"
 	"io/ioutil"
 	"strings"
-	"time"
 )
 
-//a function that will manage the backlog repo
-
-var backlog struct{
+type backlog struct{
 	created bool
 	path string // the path to the github repo from 
 }
 
-
-var updateBacklog{
+var Backlog = &cobra.Command{
 	Use: "backlog",
 	Short:"updates the backlog",
 	Run: func(cmd *cobra.Command, args []string){ // args is gonna be what we pass through 
@@ -36,20 +32,32 @@ var updateBacklog{
 			}
 
 			content := bucket.Get([]byte("backlog")) // this will return what is in the list
+// we assume initially that backlog has been created
+			path := strings.Fields(string(content))
+			if path[len(path)-4] + path[len(path)-3] + path[len(path)-2] != "current git location:"{
+				fmt.Println("Error: not at current git location in file")
+				return nil
+			}
 
-			if content == nil{ // this means that backlog is not a key within the lists bucket
+			chosen_directory := path[len(path)-1] // this will give it the directory 
+
+			var mybacklog = backlog{
+				created: true,
+				path: (string(chosen_directory)),
+			}
+
+			if content == nil{ // this means that backlog is not a key within the lists bucket yet
 				for content == nil{
 					fmt.Println("backlog not made yet... \nwhere do you wish to place backlog repo\nnote you can change this at anytime within within markdown file")
+					fmt.Println("Chosen Directory:")
 					chosen_directory := ""
 					fmt.Scan(&chosen_directory)
 
-					var mybacklog := backlog{
-						created: true,
-						path: (string(chosen_directory))
-					}
+					mybacklog.create = false
+					mybacklog.path = string(chose_directory)
 
 					new_list_content := "# backlog \n\n\n\n\n"
-					new_list_content += "# " + "Hit MQ when you are finished\n\n\ncurrent git location:" + chosen_directory
+					new_list_content += "# " + "Hit MQ when you are finished\n\n\ncurrent git location: " + chosen_directory
 					err := bucket.Put([]byte("backlog"),[]byte(new_list_content))//creates the new bucket with nothing in it 
 					if err != nil{
 						log.Println("Unable to add new backlog bucket in backlog command")
@@ -57,21 +65,7 @@ var updateBacklog{
 
 					content = bucket.Get([]byte("backlog"))
 				}
-			}else{
-				path := string.Fields(string(content))
-				if path[len(path)-4] + path[len(path)-3 + path[len(path)-2] != "current git location:"{
-					fmt.Println("Error: not at current git location in file")
-					return nil
-				}
-
-				chosen_directory := path[len(path)-1] // this will give it the directory 
-
-				var mybacklog := backlog{
-					created: true,
-					path: (string(chosen_directory))
-				}
 			}
-
 			// loop through the file and put it into one big ass string. Then push that string to the bucket
 			//first we need to write whats in the key to the file
 			// then we let the user manipulate
@@ -91,28 +85,49 @@ var updateBacklog{
 
 			content, err = ioutil.ReadFile("buffer.md")
 
-			err = bucket.Put([]byte("backlog",content)
+			err = bucket.Put([]byte("backlog"),content)
 
 			for err != nil{
-				log.Println("error in write command",err)
+				log.Println("error in backlog command putting content back into bucket",err)
 			}
 			// need to go and see if ioutil can fetch the file and if not we must create it 
-			err = ioutil.WriteFile(mybacklog.path,content, 0644) // this will create the file if it doesnt already exist
 			if !mybacklog.created{
 				// this means we need to create the directory that it needs to go in 
-				//first we will mkdir in current directory, then move to new file path
-				filename:=(strings.Fields(string(content)))
-				filename = filename[len(filename)-1]
+				filename_field := strings.Fields(string(content))
+				filename := filename_field[len(filename_field)-1] // this have some sort of string like /users/benmorehouse
 				var temp string
-				for i:=len(filename)-1;i=0;i--{
-					if filename[i] == '/'{
-						break
-					}else{
-						temp+=filename[i]
-					}
+				for i:=0;i<len(filename);i++{
+					temp+=string(filename[i])
 				}
-				os.Mkdir(
+				// at this point temp is the filepath
+				mybacklog.path = temp
+				temp = ""
+				err = os.Chdir(mybacklog.path)
+				if err != nil{
+					log.Println("error: mybacklog.created = false and we couldnt switch into the new directky:",mybacklog.path)
+					return err
+				}
 
+				err = ioutil.Writefile("backlog.md", content, 0644)
+				if err != nil{
+					log.Println("error: couldnt do writefile")
+					return err
+				}
+
+			}else{
+				err = os.Chdir(mybacklog.path)
+				if err != nil{
+					log.Println("error: mybacklog.created = true and we couldnt switch into the new directory:",mybacklog.path)
+					return err
+				}
+
+				err = ioutil.WriteFile(mybacklog.path+"/backlog.md", content , 0644) // this will create the file if it doesnt already exist
+				if err != nil{
+					log.Println("error: mybacklog.create = true but couldnt write to backlog.md")
+					return err
+				}
+			}
+			// at this point we have a markdown file. 
 			return nil
 		})
 		if err != nil {
@@ -120,3 +135,5 @@ var updateBacklog{
 		}
 	},
 }
+
+
