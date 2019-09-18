@@ -165,7 +165,9 @@ var deleteList = &cobra.Command{
 		}else{
 			temp = args[0]
 		}
-
+		if temp == "backlog"{
+			log.Fatal("You cannot delete the backlog")
+		}
 		chosen_list_key := []byte(temp) // this is the new list name within the bucket lists
 
 		err = db.Update(func(tx *bolt.Tx) error{ // how can you run the show_lists function within db.Update?

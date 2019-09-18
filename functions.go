@@ -7,11 +7,11 @@ import(
 	"log"
 	"github.com/boltdb/bolt"
 	"strings"
+	"errors"
 )
 
 func openFile(){
 	cmd := exec.Command("vim","-o","buffer.md")
-	// the hope is that buffer.txt will have everything loaded in from the bucket
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
@@ -77,5 +77,21 @@ func rc_content_manip(input, new_list string)(string){ // takes in content, puts
 	return input
 }// it's not replacing the ~ with \n. Also not getting rid of the field shit and taking out the initial test piece like i thouhgt
 
+/*
+	This function is for the manipulation of the characters for the readme for 
+	backlog
+*/
 
+func backlog_content_manip(content []byte)(error,[]byte){
+	input := string(content)
+	if input == ""{
+		return errors.New("Content is completely empty"),content
+	}
+	temp_input := strings.Split(input,string('\n'))
+	for i:=1;i<len(temp_input)-1;i++{
+		temp := " - " + temp_input[i]
+		temp_input[i] = temp
+	}
+	return nil,[]byte(strings.Join(temp_input, "\n"))
+}
 

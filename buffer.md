@@ -1,4 +1,4 @@
-# work 
+# backlog 
 
 	STD Issues to fix in ver 3.0:
 		sort the keys that you display in terms of alphabetical order using a data structure 
@@ -37,13 +37,9 @@
 	You should make a CLI Client for Timesaver
 	Make a contribution to go for github
 
-#data structures
 
-	Make the data structures to where they are able to take in any variable with an interface of some sort
-	Make a trie in golang that you can use in other languages
 
-#Kara
+# Hit MQ when you are finished
 
-	Need to be able to reach patients. Be able to reach them all efficiently.
 
-# Press MQ when you are finished
+current git location: /Users/benmorehouse/repositories/backlog

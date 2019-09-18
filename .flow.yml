@@ -8,4 +8,4 @@ default:
                 cd ~/repositories/std
 
                 go build .
-                ./std rename 
+                ./std backlog
