@@ -89,8 +89,12 @@ func backlog_content_manip(content []byte)(error,[]byte){
 	}
 	temp_input := strings.Split(input,string('\n'))
 	for i:=1;i<len(temp_input)-1;i++{
-		temp := " - " + temp_input[i]
-		temp_input[i] = temp
+		if len(temp_input[i]) <=1{
+			continue
+		}else{
+			temp := " - " + temp_input[i]
+			temp_input[i] = temp
+		}
 	}
 	return nil,[]byte(strings.Join(temp_input, "\n"))
 }
