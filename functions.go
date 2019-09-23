@@ -8,6 +8,7 @@ import(
 	"github.com/boltdb/bolt"
 	"strings"
 	"errors"
+	"github.com/golang-collections/collections/trie" // use this to organize bucket names
 )
 
 func openFile(){
@@ -38,8 +39,15 @@ func show_lists(db *bolt.DB) error {
 		temp_list := string(get_list)
 
 		final_list := strings.Fields(temp_list)
+		mytrie := trie.New()
+		mytrie.Init()
 
+		for _ , val := range final_list{
+			mytrie.Insert(val , val)
+		}
+		final_list = listOrganizer(mytrie.String())
 		fmt.Println("\tAVAILABLE LISTS\n______________________________\n")
+
 		for _ , val := range final_list {
 			fmt.Print("- ")
 			fmt.Println(val)
@@ -47,7 +55,6 @@ func show_lists(db *bolt.DB) error {
 		fmt.Println("______________________________\n")
 		return nil
 	})
-
 	return err
 }
 
@@ -98,4 +105,28 @@ func backlog_content_manip(content []byte)(error,[]byte){
 	}
 	return nil,[]byte(strings.Join(temp_input, "\n"))
 }
+
+func listOrganizer(input string)([]string){
+	if input == ""{
+		return nil
+	}
+
+	var output []string
+	outer := strings.Fields(input)
+	for _ , val := range outer{
+		var temp string
+		for _ , val2 := range val{
+			if val2 == '}' || val2 == '{'{
+				continue
+			}else if val2 == ':'{
+				break
+			}else{
+				temp += string(val2)
+			}
+		}
+		output = append(output, temp)
+	}
+	return output
+}
+
 
