@@ -13,17 +13,15 @@ import (
 
 var bucketName = []byte("Lists")
 
-var writeList = &cobra.Command{ // appends to the end of the bucket
-// store some data that is written by the user
+var writeList = &cobra.Command{
 	Use: "open",
 	Short:"Open the current list",
-	Run: func(cmd *cobra.Command, args []string){ // args is gonna be what we pass through 
-		// open tmp, let user input, then read line for line and add into bucket
+	Run: func(cmd *cobra.Command, args []string){
 		db, err := bolt.Open("mainDatabase.db", 0600, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer db.Close() // will close at end of function run
+		defer db.Close()
 
 		var temp string
 		if len(args) != 1{
