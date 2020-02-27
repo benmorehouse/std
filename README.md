@@ -8,9 +8,13 @@ organize tasks from work, school, groceries, or anything else you want to keep a
 STD is useful not only to keep work held in your work environment, but also because it is your own way 
 of organizing what you want to have on your computer!
 
-# Installation
+# Using STD 
 
 If you just wish to use the project as a tool, [then run the binary!](https://github.com/benmorehouse/std/releases/tag/v1.0)
+
+# Contributing
+
+If you wish to fork this project and work on it more, then by all means!
 
 If you do not have homebrew, go here: https://brew.sh
 
