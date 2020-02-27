@@ -10,6 +10,8 @@ of organizing what you want to have on your computer!
 
 # Installation
 
+If you just wish to use the project as a tool, [then run the binary!](https://github.com/benmorehouse/std/releases/tag/v1.0)
+
 If you do not have homebrew, go here: https://brew.sh
 
 Once you have homebrew, if you do not have go installed then entire
@@ -18,6 +20,7 @@ Once you have homebrew, if you do not have go installed then entire
 
 into your desired directory.
 Then install the following two package:
+
 	Boltdb: go get github.com/boltdb/bolt/...
         Cobra: go get -u github.com/spf13/cobra/cobra 
 
