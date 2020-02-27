@@ -325,7 +325,7 @@ var renameList = &cobra.Command{
 	},
 }
 
-var elcome = &cobra.Command{ // appends to the end of the bucket
+var welcome = &cobra.Command{ // appends to the end of the bucket
 	// store some data that is written by the user
 	Use:   "welcome",
 	Short: "welcome message",
