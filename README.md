@@ -12,6 +12,24 @@ of organizing what you want to have on your computer!
 
 If you just wish to use the project as a tool, [then run the binary!](https://github.com/benmorehouse/std/releases/tag/v1.0)
 
+After installing, ./std will show you the commands that are available for you to use. 
+
+	backlog - A place for ideas that can also be placed in it's own repo for your own github!
+	create - create a list
+	delete - delete list
+	help - display the help menu
+	open - open the designated list
+	rename - rename a given list to something else
+	welcome - welcome message as well as version that is currently in use
+
+Examples
+	
+	./std open 
+	./std delete worklist
+	./std backlog
+
+
+
 # Contributing
 
 If you wish to fork this project and work on it more, then by all means!
@@ -38,23 +56,6 @@ Then you are all set to run STD!
 		
 	./std
 
-# Use
-
-After installing, ./std will show you the commands that are available for you to use. 
-
-	backlog - A place for ideas that can also be placed in it's own repo for your own github!
-	create - create a list
-	delete - delete list
-	help - display the help menu
-	open - open the designated list
-	rename - rename a given list to something else
-	welcome - welcome message as well as version that is currently in use
-
-Examples
-	
-	./std open 
-	./std delete worklist
-	./std backlog
 
 # Coming soon
 	
