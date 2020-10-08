@@ -28,15 +28,15 @@ before_script:
 
 branches:
     only:
-        - gh-pages
-            - /.*/
+        - /.*/
 
 script:
   - env GO111MODULE=on make bin 
   - make clean
   - make mocks
   - make bin 
-  - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - make test
+  # - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t 53546034-5ccf-4f1c-9aba-4a9c09aaedb3

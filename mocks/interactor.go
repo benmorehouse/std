@@ -5,6 +5,8 @@
 package mocks
 
 import (
+	repo "github.com/benmorehouse/std/repo"
+	utils "github.com/benmorehouse/std/utils"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -58,4 +60,18 @@ func (m *MockInteractor) Input() string {
 func (mr *MockInteractorMockRecorder) Input() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Input", reflect.TypeOf((*MockInteractor)(nil).Input))
+}
+
+// RunLifeCycle mocks base method
+func (m *MockInteractor) RunLifeCycle(db repo.Repo, bucketName string, user utils.Interactor, creatingNewBucket bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunLifeCycle", db, bucketName, user, creatingNewBucket)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RunLifeCycle indicates an expected call of RunLifeCycle
+func (mr *MockInteractorMockRecorder) RunLifeCycle(db, bucketName, user, creatingNewBucket interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunLifeCycle", reflect.TypeOf((*MockInteractor)(nil).RunLifeCycle), db, bucketName, user, creatingNewBucket)
 }

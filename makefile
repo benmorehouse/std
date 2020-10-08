@@ -3,6 +3,7 @@
 
 MOCK_DIR=mocks
 BIN_FILE=./bin/std
+TESTING_DOTFILES=~/.std/.testing
 
 bin:
 	cd ./cmd && go build -o ../bin/std
@@ -13,6 +14,9 @@ clean:
 	@if [ -d "$(BIN_FILE)" ]; then \
 		rm -r -f $(BIN_FILE); \
 	fi
+	@if [ -d "$(TESTING_DOTFILES)" ]; then \
+		rm -r -f $(TESTING_DOTFILES); \
+	fi
 	@echo "STD Cleaned"
 
 mocks:
@@ -22,7 +26,7 @@ mocks:
 	mockgen -destination=./mocks/repo.go -package=mocks -source=./repo/repo.go ./repo/repo.go Repo
 
 test: 
-	go test ./...
+	go test --cover ./...
 
 help:
 	@echo 'build - force create a binary and drop in ./bin'

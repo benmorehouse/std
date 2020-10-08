@@ -11,7 +11,7 @@ var Command = &cobra.Command{
 	Use:   "open ",
 	Short: "Open the current list",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return process(repo.DefaultConnector(), utils.StdInteractor(), args)
+		return process(repo.DefaultConnector(), utils.DefaultInteractor(), args)
 	},
 }
 
@@ -30,11 +30,10 @@ func process(connector repo.Connector, user utils.Interactor, args []string) err
 	}
 
 	if bucketName == "backlog" {
-		// then go ahead and run the backlog command
 		return nil
 	}
 
-	if err := utils.RunLifeCycle(db, bucketName, user); err != nil {
+	if err := user.RunLifeCycle(db, bucketName, user, false); err != nil {
 		return err
 	}
 

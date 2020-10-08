@@ -11,7 +11,6 @@ import (
 type Repo interface {
 	List() []string
 	Put(bucketName, newValue string) error
-	Create(bucketName string) error
 	Remove(key string) error
 	Get(key string) string
 }
@@ -36,24 +35,18 @@ func (d *defaultRepo) List() (list []string) {
 
 // Put will put whatever is in the repo
 func (d *defaultRepo) Put(bucketName, newValue string) error {
-	return d.db.Update(func(tx *bolt.Tx) error {
+	return d.db.Update(func(tx *bolt.Tx) (err error) {
 		bucket := tx.Bucket([]byte(bucketName))
 		if bucket == nil {
-			return fmt.Errorf("bucket_not_exists")
+			if bucket, err = tx.CreateBucketIfNotExists([]byte(bucketName)); err != nil {
+				return fmt.Errorf("unable_to_create_entry: %s", err.Error())
+			}
 		}
-		return bucket.Put([]byte(bucketName), []byte(newValue))
-	})
-}
 
-// Create will create a list and drop it in our repo
-func (d *defaultRepo) Create(bucketName string) error {
-	return d.db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(bucketName))
-		if err != nil {
-			return err
+		if err = bucket.Put([]byte(bucketName), []byte(newValue)); err != nil {
+			return fmt.Errorf("unable_to_put_entry: %s", err.Error())
 		}
-		return bucket.Put([]byte(bucketName),
-			[]byte(fmt.Sprintf("# %s \n\n\n\n\n # Close Vim window when you are finished", bucketName)))
+		return nil
 	})
 }
 

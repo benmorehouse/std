@@ -60,20 +60,6 @@ func (mr *MockRepoMockRecorder) Put(bucketName, newValue interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockRepo)(nil).Put), bucketName, newValue)
 }
 
-// Create mocks base method
-func (m *MockRepo) Create(bucketName string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", bucketName)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Create indicates an expected call of Create
-func (mr *MockRepoMockRecorder) Create(bucketName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepo)(nil).Create), bucketName)
-}
-
 // Remove mocks base method
 func (m *MockRepo) Remove(key string) error {
 	m.ctrl.T.Helper()
