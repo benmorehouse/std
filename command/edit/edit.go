@@ -8,7 +8,7 @@ import (
 
 // Command will provide key editing capabilities
 var Command = &cobra.Command{
-	Use:   "",
+	Use:   "open ",
 	Short: "Open the current list",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return process(repo.DefaultConnector(), utils.StdInteractor(), args)
