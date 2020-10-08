@@ -12,11 +12,13 @@ import (
 )
 
 type config struct {
-	DatabasePath  string `yaml:"database_path"`
-	TempWorkSpace string `yaml:"temp_workspace"`
-	LogFile       string `yaml:"log_file"`
-	BufferMDFile  string `yaml:"buffer_md_file"`
-	dotFileConfig string
+	DatabasePath   string `yaml:"database_path"`
+	TempWorkSpace  string `yaml:"temp_workspace"`
+	LogFile        string `yaml:"log_file"`
+	BufferMDFile   string `yaml:"buffer_md_file"`
+	VaultAddr      string `yaml:"vault_addr"`
+	VaultStaticKey string `yaml:"vault_static_key"`
+	dotFileConfig  string
 }
 
 const (
@@ -28,11 +30,13 @@ const (
 
 // STDConf embodies the set configurations for the application
 var STDConf = &config{
-	DatabasePath:  ".std/db/mainDB.db",
-	TempWorkSpace: ".std/tmp/",
-	LogFile:       ".std/logging/std.log",
-	BufferMDFile:  ".std/logging/stdin.buffer.md",
-	dotFileConfig: ".std/config.yml",
+	DatabasePath:   ".std/db/mainDB.db",
+	TempWorkSpace:  ".std/tmp/",
+	LogFile:        ".std/logging/std.log",
+	BufferMDFile:   ".std/logging/stdin.buffer.md",
+	VaultAddr:      "",
+	VaultStaticKey: "",
+	dotFileConfig:  ".std/config.yml",
 }
 
 var root string

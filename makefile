@@ -10,3 +10,8 @@ mocks:
 	mockgen -destination=./mocks/repo.go -source=./repo/repo.go ./repo/repo.go Repo
 help:
 	@echo 'build - force create a binary and drop in ./bin'
+
+vault:
+	@echo 'installing hashicorp vault'
+	brew tap hashicorp/tap
+	brew install hashicorp/tap/vault
