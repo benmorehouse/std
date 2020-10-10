@@ -1,0 +1,37 @@
+language: go
+
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
+install: true
+sudo: false
+
+go:
+  - 1.14.x
+env:
+  global:
+    - GOPROXY=https://proxy.golang.org
+    - GOARCH=amd64
+    - GO_FOR_RELEASE=1.14
+    - CODECOV_TOKEN="53546034-5ccf-4f1c-9aba-4a9c09aaedb3"
+
+notifications:
+  email:
+    recipients:
+      - morehouseb18@gmail.com
+    on_success: never
+    on_failure: always
+
+before_script:
+  - GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
+
+script:
+  - env GO111MODULE=on make bin 
+  - make clean
+  - make mocks
+  - make bin 
+  - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t 53546034-5ccf-4f1c-9aba-4a9c09aaedb3

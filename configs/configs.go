@@ -3,12 +3,14 @@ package configs
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	userOS "os/user"
 	"path/filepath"
+	"strconv"
+
+	log "github.com/sirupsen/logrus"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type config struct {
@@ -28,16 +30,21 @@ const (
 	ListBucketKey = "std_bucket_key"
 )
 
+const (
+	testingConfigEnv      = "STD_CONFIG_TESTING"
+	baseDotfileDir        = ".std"
+	baseTestingDir        = ".testing"
+	defaultDatabasePath   = "db/mainDB.db"
+	defaultTempWorkSpace  = "tmp/"
+	defaultLogFile        = "logging/std.log"
+	defaultBufferMDFile   = "logging/stdin.buffer.md"
+	defaultVaultAddr      = ""
+	defaultVaultStaticKey = ""
+	dotFileConfig         = "config.yml"
+)
+
 // STDConf embodies the set configurations for the application
-var STDConf = &config{
-	DatabasePath:   ".std/db/mainDB.db",
-	TempWorkSpace:  ".std/tmp/",
-	LogFile:        ".std/logging/std.log",
-	BufferMDFile:   ".std/logging/stdin.buffer.md",
-	VaultAddr:      "",
-	VaultStaticKey: "",
-	dotFileConfig:  ".std/config.yml",
-}
+var STDConf = &config{}
 
 var root string
 
@@ -61,12 +68,19 @@ func setConfigWithUserRoot() error {
 		return err
 	}
 
-	root = usr.HomeDir
-	STDConf.dotFileConfig = filepath.Join(root, STDConf.dotFileConfig)
-	STDConf.BufferMDFile = filepath.Join(root, STDConf.BufferMDFile)
-	STDConf.DatabasePath = filepath.Join(root, STDConf.DatabasePath)
-	STDConf.LogFile = filepath.Join(root, STDConf.LogFile)
-	STDConf.TempWorkSpace = filepath.Join(root, STDConf.TempWorkSpace)
+	root = filepath.Join(usr.HomeDir, baseDotfileDir)
+	testingEnvironment, _ := strconv.ParseBool(os.Getenv(testingConfigEnv))
+	if testingEnvironment {
+		root = filepath.Join(usr.HomeDir, baseDotfileDir, baseTestingDir)
+	}
+
+	STDConf.dotFileConfig = filepath.Join(root, dotFileConfig)
+	STDConf.BufferMDFile = filepath.Join(root, defaultBufferMDFile)
+	STDConf.DatabasePath = filepath.Join(root, defaultDatabasePath)
+	STDConf.LogFile = filepath.Join(root, defaultLogFile)
+	STDConf.TempWorkSpace = filepath.Join(root, defaultTempWorkSpace)
+	STDConf.VaultAddr = defaultVaultAddr
+
 	return nil
 }
 
