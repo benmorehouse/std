@@ -76,6 +76,11 @@ func (i *iterm) RunLifeCycle(db repo.Repo, bucketName string, user Interactor, c
 		log.Println("Error opening file in writelist:", err)
 	}
 
+	if creatingNewBucket {
+		content = fmt.Sprintf(
+			"# %s\n\n\n\n\n# Escape vim window normally to exit", bucketName)
+	}
+
 	if _, err = file.Write([]byte(content)); err != nil {
 		log.Println("Error writing file in writelist: ", err)
 	}
@@ -87,6 +92,12 @@ func (i *iterm) RunLifeCycle(db repo.Repo, bucketName string, user Interactor, c
 	fileContent, err := ioutil.ReadFile(configs.STDConf.BufferMDFile)
 	if err != nil {
 		return fmt.Errorf("file_close_fail: %s", err.Error())
+	}
+
+	if strings.TrimSpace(string(fileContent)) == "" {
+		if err := db.Remove(bucketName); err != nil {
+			return fmt.Errorf("todo_list_remove_error: %s", err.Error())
+		}
 	}
 
 	if err := db.Put(bucketName, string(fileContent)); err != nil {

@@ -2,11 +2,12 @@
 #################### Generate Binary ##################
 
 MOCK_DIR=mocks
-BIN_FILE=./bin/std
+BIN_FILE=./bin
 TESTING_DOTFILES=~/.std/.testing
 
 bin:
-	cd ./cmd && go build -o ../bin/std
+	@cd ./cmd && go build -o ../bin/std
+	@echo "Binary created!"
 clean:
 	@if [ -d "$(MOCK_DIR)" ]; then \
 		rm -r -f $(MOCK_DIR); \
@@ -25,7 +26,7 @@ mocks:
 	mockgen -destination=./mocks/interactor.go -package=mocks -source=./utils/interactor.go ./utils/interactor.go Interactor
 	mockgen -destination=./mocks/repo.go -package=mocks -source=./repo/repo.go ./repo/repo.go Repo
 
-test: 
+test: mocks
 	go test --cover ./...
 
 help:

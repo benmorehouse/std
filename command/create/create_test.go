@@ -45,7 +45,7 @@ var _ = Describe("Create Command", func() {
 		It("use in lifecycle", func() {
 			connectorMock.EXPECT().Connect().Return(boltMock, nil)
 			userMock.EXPECT().RunLifeCycle(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
-			boltMock.EXPECT().Get(gomock.Any()).Return("welcome to std")
+			boltMock.EXPECT().Get(gomock.Any()).Return("")
 			err := process(connectorMock, userMock, []string{"bucket"})
 			Expect(err).ShouldNot(HaveOccurred())
 		})
@@ -55,7 +55,7 @@ var _ = Describe("Create Command", func() {
 		It("get for lifecycle", func() {
 			connectorMock.EXPECT().Connect().Return(boltMock, nil)
 			userMock.EXPECT().Input().Return("bucket")
-			boltMock.EXPECT().Get("bucket").Return("welcome to std")
+			boltMock.EXPECT().Get("bucket").Return("")
 			boltMock.EXPECT().List().Return([]string{"sauce"})
 			userMock.EXPECT().RunLifeCycle(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 			err := process(connectorMock, userMock, nil)
@@ -68,8 +68,8 @@ var _ = Describe("Create Command", func() {
 			connectorMock.EXPECT().Connect().Return(boltMock, nil)
 			userMock.EXPECT().Input().Return("bucket")
 			gomock.InOrder(
+				boltMock.EXPECT().Get("bucket").Return("stuff"),
 				boltMock.EXPECT().Get("bucket").Return(""),
-				boltMock.EXPECT().Get("bucket").Return("oh this has something"),
 			)
 			boltMock.EXPECT().List().Return([]string{"sauce"})
 			userMock.EXPECT().RunLifeCycle(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
