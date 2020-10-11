@@ -26,6 +26,11 @@ notifications:
 before_script:
   - GO111MODULE=on go get github.com/golang/mock/mockgen@v1.4.4
 
+branches:
+    only:
+        - gh-pages
+            - /.*/
+
 script:
   - env GO111MODULE=on make bin 
   - make clean
