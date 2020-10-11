@@ -1,7 +1,10 @@
 # STD
 
-[![codecov](https://codecov.io/gh/benmorehouse/std/branch/master/graph/badge.svg)](https://codecov.io/gh/benmorehouse/std)
+[![codecov](https://codecov.io/gh/benmorehouse/std/branch/develop/graph/badge.svg)](https://codecov.io/gh/benmorehouse/std)
 [![Build Status](https://travis-ci.com/benmorehouse/std.svg?branch=develop)](https://travis-ci.com/benmorehouse/std)
+[![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens)
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+
 
 ## A simple task manager
 
