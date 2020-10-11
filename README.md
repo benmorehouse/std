@@ -1,5 +1,8 @@
 # STD
 
+[![codecov](https://codecov.io/gh/benmorehouse/std/branch/master/graph/badge.svg)](https://codecov.io/gh/benmorehouse/std)
+[![Build Status](https://travis-ci.com/benmorehouse/std.svg?branch=develop)](https://travis-ci.com/benmorehouse/std)
+
 ## A simple task manager
 
 Welcome to STD (or as I like to call, shit to do)! This is a simple task manager that can be used to 
