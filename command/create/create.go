@@ -15,7 +15,7 @@ var Command = &cobra.Command{
 	Short:   "create a list",
 	Example: "./std create work",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return process(repo.DefaultConnector(), utils.StdInteractor(), args)
+		return process(repo.DefaultConnector(), utils.DefaultInteractor(), args)
 	},
 }
 
@@ -34,17 +34,13 @@ func process(connector repo.Connector, user utils.Interactor, args []string) err
 		newBucketName = args[0]
 	}
 
-	for db.Get(newBucketName) != "" {
+	for db.Get(newBucketName) == "" {
 		fmt.Printf("%s already exists.\n", newBucketName)
 		utils.DisplayBucketList(db)
 		newBucketName = user.Input()
 	}
 
-	if err := db.Create(newBucketName); err != nil {
-		return fmt.Errorf("cant_create_new_list: %s", err.Error())
-	}
-
-	if err := utils.RunLifeCycle(db, newBucketName, user); err != nil {
+	if err := user.RunLifeCycle(db, newBucketName, user, true); err != nil {
 		return err
 	}
 	return nil

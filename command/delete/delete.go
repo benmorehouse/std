@@ -14,7 +14,7 @@ var Command = &cobra.Command{
 	Short:   "Delete the list from the database",
 	Example: "./std delete work",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return process(repo.DefaultConnector(), utils.StdInteractor(), args)
+		return process(repo.DefaultConnector(), utils.DefaultInteractor(), args)
 	},
 }
 

@@ -1,27 +1,21 @@
 package hashicorp
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/benmorehouse/std/configs"
+	"github.com/benmorehouse/std/repo"
 	"github.com/hashicorp/vault/api"
 )
-
-// VaultClient is the vault client that will provide super
-// secret awesome access to stuff
-type VaultClient interface {
-	Get(key string) (string, error)
-	Put(key, value string) error
-}
 
 type hashicorpClient struct {
 	client *api.Client
 }
 
 // DefaultVaultClient will return us a client for our secrest stowed away in vault
-func DefaultVaultClient() (VaultClient, error) {
+func DefaultVaultClient() (repo.Repo, error) {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -39,27 +33,42 @@ func DefaultVaultClient() (VaultClient, error) {
 }
 
 // Get will go into our vault instance and get a secret
-func (c *hashicorpClient) Get(key string) (string, error) {
+func (c *hashicorpClient) Get(key string) string {
 	resp, err := c.client.Logical().Read(key)
 	if err != nil {
-		return "", nil
+		log.Println(err)
+		return ""
 	}
 
 	raw, exists := resp.Data[key]
 	if !exists {
-		return "", fmt.Errorf("password_not_part_of_data: %s", err.Error())
+		log.Println(err)
+		return ""
 	}
 
 	value, ok := raw.(string)
 	if !ok {
-		return "", fmt.Errorf("value_invalid_type: %s", err.Error())
+		log.Println(err)
+		return ""
 	}
 
-	return value, nil
+	return value
 }
 
 // Put will go and put a value into vault
 func (c *hashicorpClient) Put(key, value string) (err error) {
 	_, err = c.client.Logical().Write(key, map[string]interface{}{key: value})
 	return
+}
+
+// List will go and put a value into vault
+func (c *hashicorpClient) List() []string {
+	// list, err := c.client.Logical().List("")
+	return nil
+}
+
+// Remove will go and put a value into vault
+func (c *hashicorpClient) Remove(key string) (err error) {
+	_, err = c.client.Logical().Delete(key)
+	return err
 }
