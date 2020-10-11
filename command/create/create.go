@@ -34,7 +34,7 @@ func process(connector repo.Connector, user utils.Interactor, args []string) err
 		newBucketName = args[0]
 	}
 
-	for db.Get(newBucketName) == "" {
+	for db.Get(newBucketName) != "" {
 		fmt.Printf("%s already exists.\n", newBucketName)
 		utils.DisplayBucketList(db)
 		newBucketName = user.Input()
