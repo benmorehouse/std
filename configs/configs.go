@@ -80,7 +80,6 @@ func setConfigWithUserRoot() error {
 	STDConf.LogFile = filepath.Join(root, defaultLogFile)
 	STDConf.TempWorkSpace = filepath.Join(root, defaultTempWorkSpace)
 	STDConf.VaultAddr = defaultVaultAddr
-
 	return nil
 }
 

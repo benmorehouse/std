@@ -3,6 +3,7 @@ package create
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/benmorehouse/std/repo"
 	"github.com/benmorehouse/std/utils"
@@ -27,11 +28,11 @@ func process(connector repo.Connector, user utils.Interactor, args []string) err
 	}
 
 	var newBucketName string
-	if len(args) != 1 {
+	if len(args) == 0 {
 		utils.DisplayBucketList(db)
 		newBucketName = user.Input()
 	} else {
-		newBucketName = args[0]
+		newBucketName = strings.Join(args, " ")
 	}
 
 	for db.Get(newBucketName) != "" {

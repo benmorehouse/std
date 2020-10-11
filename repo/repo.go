@@ -64,7 +64,6 @@ func (d *defaultRepo) Get(key string) (value string) {
 		if bucket == nil {
 			return fmt.Errorf("bucket_not_found")
 		}
-		fmt.Println(key)
 		value = string(bucket.Get([]byte(key)))
 		return nil
 	})
