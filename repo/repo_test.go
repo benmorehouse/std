@@ -13,10 +13,6 @@ func TestRepoCommand(t *testing.T) {
 	RunSpecs(t, "Repo Functionality")
 }
 
-var _ = BeforeSuite(func() {
-	os.Setenv("STD_CONFIG_TESTING", "true")
-})
-
 var _ = Describe("Create Command", func() {
 	var (
 		connector   Connector
@@ -32,6 +28,7 @@ var _ = Describe("Create Command", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 		currentList = "todo-list"
 		stuffToDo = "clean the dishes"
+		os.Setenv("STD_CONFIG_TESTING", "true")
 	})
 
 	AfterEach(func() {
