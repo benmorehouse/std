@@ -20,15 +20,23 @@ If you just wish to use the project as a tool, [then run the binary!](https://gi
 
 STD is simply a tool to keep track of your stuff without ever leaving the command line!
 
+Here are all the available commands
 ![About page](.assets/help_list.png)
+
+You can say... create a list!
 ![Create Page](.assets/create_list.png)
+
+Then go and edit it!
 ![Edit Page](.assets/edit_list.png)
 
-Examples
-	
-	./std open 
-	./std delete worklist
-	./std backlog
+
+You can also hold passwords!
+![Password Command](.assets/password-help.png)
+
+And access them when you need.
+![Password Command](.assets/password-exec.png)
+
+Interested in the terminal setup you are seeing? Check out my dotfiles! https://github.com/benmorehouse/dotfiles
 
 # Thanks and welcome to STD - A better way to manage your shit.
 	
