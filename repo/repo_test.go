@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"github.com/benmorehouse/std/configs"
 	"os"
 	"testing"
 
@@ -15,40 +16,68 @@ func TestRepoCommand(t *testing.T) {
 
 var _ = Describe("Create Command", func() {
 	var (
-		connector   Connector
-		err         error
-		repo        Repo
-		currentList string
-		stuffToDo   string
+		passwordConnector, listConnector Connector
+		err                              error
+		passwordRepo, listRepo           Repo
+		currentList                      string
+		stuffToDo                        string
 	)
 
 	BeforeEach(func() {
-		connector = DefaultConnector()
-		repo, err = connector.Connect()
+		os.Setenv("STD_CONFIG_TESTING", "true")
+
+		err = configs.SetConfigWithUserRoot()
 		Expect(err).ShouldNot(HaveOccurred())
+
+		passwordConnector = PasswordConnector()
+		listConnector = ListConnector()
+
+		passwordRepo, err = passwordConnector.Connect()
+		Expect(err).ShouldNot(HaveOccurred())
+
+		listRepo, err = listConnector.Connect()
+		Expect(err).ShouldNot(HaveOccurred())
+
 		currentList = "todo-list"
 		stuffToDo = "clean the dishes"
-		os.Setenv("STD_CONFIG_TESTING", "true")
 	})
 
 	AfterEach(func() {
-		Expect(connector.Disconnect()).ShouldNot(HaveOccurred())
+		Expect(listConnector.Disconnect()).ShouldNot(HaveOccurred())
+		Expect(passwordConnector.Disconnect()).ShouldNot(HaveOccurred())
 	})
 
-	Context("Should be able to run a full lifecycle", func() {
+	Context("Should be able to run a full lifecycle for lists", func() {
 		It("and act accordingly", func() {
 			// First put
-			err = repo.Put(currentList, stuffToDo)
+			err = listRepo.Put(currentList, stuffToDo)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			// then get
-			Expect(repo.Get(currentList)).To(Equal(stuffToDo))
+			Expect(listRepo.Get(currentList)).To(Equal(stuffToDo))
 
 			// then list
-			Expect(repo.List()).To(Equal([]string{currentList}))
+			Expect(listRepo.List()).To(Equal([]string{currentList}))
 
 			// then delete
-			Expect(repo.Remove(currentList)).ShouldNot(HaveOccurred())
+			Expect(listRepo.Remove(currentList)).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("Should be able to run a full lifecycle for passwords", func() {
+		It("and act accordingly", func() {
+			// First put
+			err = passwordRepo.Put(currentList, stuffToDo)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			// then get
+			Expect(passwordRepo.Get(currentList)).To(Equal(stuffToDo))
+
+			// then list
+			Expect(passwordRepo.List()).To(BeNil())
+
+			// then delete
+			Expect(passwordRepo.Remove(currentList)).ShouldNot(HaveOccurred())
 		})
 	})
 })

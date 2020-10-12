@@ -27,12 +27,13 @@ var _ = Describe("Configs", func() {
 	)
 
 	BeforeEach(func() {
+		os.Setenv(testingConfigEnv, "true")
 		usr, err = userOS.Current()
 		Expect(err).ShouldNot(HaveOccurred())
 		rootDir = usr.HomeDir
 		testConfigName = filepath.Join(rootDir, ".std/.testing/logging/std.log")
 		os.Setenv(testingConfigEnv, "true")
-		err = setConfigWithUserRoot()
+		err = SetConfigWithUserRoot()
 		Expect(err).ShouldNot(HaveOccurred())
 		err = makePaths()
 		Expect(err).ShouldNot(HaveOccurred())

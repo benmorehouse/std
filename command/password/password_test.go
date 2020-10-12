@@ -18,15 +18,17 @@ func TestPassswordCommand(t *testing.T) {
 var _ = Describe("Password Command", func() {
 
 	var (
-		ctrl      *gomock.Controller
-		vaultMock *mocks.MockRepo
-		userMock  *mocks.MockInteractor
-		commonErr error
+		ctrl          *gomock.Controller
+		vaultMock     *mocks.MockRepo
+		userMock      *mocks.MockInteractor
+		connectorMock *mocks.MockConnector
+		commonErr     error
 	)
 
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 		vaultMock = mocks.NewMockRepo(ctrl)
+		connectorMock = mocks.NewMockConnector(ctrl)
 		userMock = mocks.NewMockInteractor(ctrl)
 		commonErr = fmt.Errorf("Some bad error")
 	})
@@ -38,9 +40,10 @@ var _ = Describe("Password Command", func() {
 					userMock.EXPECT().Input().Return("key"),
 					userMock.EXPECT().Input().Return("value"),
 				)
+				connectorMock.EXPECT().Connect().Return(vaultMock, nil)
 
 				vaultMock.EXPECT().Put("key", "value").Return(nil)
-				err := process(vaultMock, userMock, true)
+				err := process(connectorMock, userMock, "put")
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -49,8 +52,9 @@ var _ = Describe("Password Command", func() {
 			It("get", func() {
 				userMock.EXPECT().Input().Return("password")
 				vaultMock.EXPECT().Get("password").Return("sugar and spice make everything nice")
+				connectorMock.EXPECT().Connect().Return(vaultMock, nil)
 
-				err := process(vaultMock, userMock, false)
+				err := process(connectorMock, userMock, "get")
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -139,4 +143,33 @@ var _ = Describe("Password Command", func() {
 			})
 		})
 	})
+
+	Describe("When removing a password", func() {
+		Context("and getting a valid password first try", func() {
+			It("remove that password", func() {
+				userMock.EXPECT().Input().Return("chase-bank")
+				vaultMock.EXPECT().Get("chase-bank").Return("some-dope-password")
+				vaultMock.EXPECT().Remove("chase-bank").Return(nil)
+				Expect(removePassword(vaultMock, userMock)).ShouldNot(HaveOccurred())
+			})
+		})
+
+		Context("and giving valid password second try", func() {
+			It("remove that password", func() {
+				gomock.InOrder(
+					userMock.EXPECT().Input().Return("chase-bank-wrong"),
+					userMock.EXPECT().Input().Return("chase-bank"),
+				)
+
+				gomock.InOrder(
+					vaultMock.EXPECT().Get("chase-bank-wrong").Return(""),
+					vaultMock.EXPECT().Get("chase-bank").Return("some-dope-password"),
+				)
+				vaultMock.EXPECT().Remove("chase-bank").Return(nil)
+				Expect(removePassword(vaultMock, userMock)).ShouldNot(HaveOccurred())
+			})
+		})
+
+	})
+
 })

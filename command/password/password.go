@@ -3,7 +3,6 @@ package password
 import (
 	"fmt"
 
-	"github.com/benmorehouse/std/hashicorp"
 	"github.com/benmorehouse/std/repo"
 	"github.com/benmorehouse/std/utils"
 	"github.com/spf13/cobra"
@@ -16,24 +15,61 @@ var Command = &cobra.Command{
 	Short:   "Manage personal passwords",
 	Example: "./std password",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		c, err := hashicorp.DefaultVaultClient()
-		if err != nil {
-			return fmt.Errorf("hashicorp_password_client_fail: %s", err.Error())
+		if viper.GetBool(putCLIKey) && viper.GetBool(removeCLIKey) {
+			return fmt.Errorf("please select either remove or put")
 		}
-		return process(c, utils.DefaultInteractor(), viper.GetBool(putCLIKey))
+
+		if viper.GetBool(putCLIKey) {
+			return process(repo.PasswordConnector(), utils.DefaultInteractor(), putCLIKey)
+		}
+
+		if viper.GetBool(removeCLIKey) {
+			return process(repo.PasswordConnector(), utils.DefaultInteractor(), removeCLIKey)
+		}
+
+		return process(repo.PasswordConnector(), utils.DefaultInteractor(), getDefaultKey)
 	},
 }
 
-const putCLIKey = "put"
+const (
+	putCLIKey     = "put"
+	removeCLIKey  = "remove"
+	getDefaultKey = "get"
+)
 
-func process(vaultClient repo.Repo, user utils.Interactor, userWillPutPassword bool) (err error) {
-	if userWillPutPassword {
-		return putPassword(vaultClient, user)
+func process(connector repo.Connector, user utils.Interactor, userAction string) (err error) {
+	db, err := connector.Connect()
+	if err != nil {
+		return fmt.Errorf("unable_to_connect: %s", err.Error())
 	}
-	return getPassword(vaultClient, user)
+
+	switch userAction {
+	case putCLIKey:
+		return putPassword(db, user)
+	case removeCLIKey:
+		return removePassword(db, user)
+	default:
+		return getPassword(db, user)
+	}
 }
 
-func putPassword(vaultClient repo.Repo, user utils.Interactor) error {
+func removePassword(db repo.Repo, user utils.Interactor) error {
+	fmt.Print("Name of password:")
+	key := user.Input()
+	for db.Get(key) == "" {
+		fmt.Println("Password doesn't exist")
+		fmt.Print("Name of password:")
+		key = user.Input()
+	}
+
+	if err := db.Remove(key); err != nil {
+		return fmt.Errorf("unable_to_put_vault_secret: %s", err.Error())
+	}
+
+	return nil
+}
+
+func putPassword(db repo.Repo, user utils.Interactor) error {
 	fmt.Print("Name of password:")
 	key := user.Input()
 	for key == "" {
@@ -48,21 +84,21 @@ func putPassword(vaultClient repo.Repo, user utils.Interactor) error {
 		value = user.Input()
 	}
 
-	if err := vaultClient.Put(key, value); err != nil {
+	if err := db.Put(key, value); err != nil {
 		return fmt.Errorf("unable_to_put_vault_secret: %s", err.Error())
 	}
 
 	return nil
 }
 
-func getPassword(vaultClient repo.Repo, user utils.Interactor) error {
+func getPassword(db repo.Repo, user utils.Interactor) error {
 	fmt.Print("Name of password:")
 	key := user.Input()
-	password := vaultClient.Get(key)
+	password := db.Get(key)
 	for password == "" {
 		fmt.Println("Password not found. Please try again.")
 		key = user.Input()
-		password = vaultClient.Get(key)
+		password = db.Get(key)
 	}
 	fmt.Println(password)
 	return nil
@@ -70,6 +106,8 @@ func getPassword(vaultClient repo.Repo, user utils.Interactor) error {
 
 func init() {
 	Command.PersistentFlags().Bool(putCLIKey, false, "I want to put a password in")
+	Command.PersistentFlags().Bool(removeCLIKey, false, "I want to delete a password")
 
 	viper.BindPFlag(putCLIKey, Command.PersistentFlags().Lookup(putCLIKey))
+	viper.BindPFlag(removeCLIKey, Command.PersistentFlags().Lookup(removeCLIKey))
 }

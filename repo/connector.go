@@ -14,28 +14,51 @@ type Connector interface {
 	Disconnect() (err error)
 }
 
-// DefaultConnector will return a connector that will
+// ListConnector will return a connector that will
 // bridge to the embedded database
-func DefaultConnector() Connector {
-	return &defaultConnector{}
+func ListConnector() Connector {
+	return &listConnector{}
 }
 
-// defaultConnector will implement the connector interface
-type defaultConnector struct {
+// PasswordConnector will create a connector for the password db storage
+func PasswordConnector() Connector {
+	return &passwordConnector{}
+}
+
+// listConnector will create a database connector for our lists
+type listConnector struct {
+	db *bolt.DB
+}
+
+// passwordConnector will create a connection to our separate password database
+type passwordConnector struct {
 	db *bolt.DB
 }
 
 // Connect will use the default connector to wrap a connection
 // to the database
-func (d *defaultConnector) Connect() (repo Repo, err error) {
-	d.db, err = bolt.Open(configs.STDConf.DatabasePath, 0744, nil)
+func (d *listConnector) Connect() (repo Repo, err error) {
+	d.db, err = bolt.Open(configs.STDConf.ListDatabasePath, 0744, nil)
 	if err != nil {
-		log.Println("Error opening database connection", err)
-		return
+		log.Fatal("Error opening database connection", err)
 	}
-	return &defaultRepo{db: d.db}, nil
+	return &listRepo{db: d.db}, nil
 }
 
-func (d *defaultConnector) Disconnect() error {
+func (d *listConnector) Disconnect() error {
+	return d.db.Close()
+}
+
+// Connect will use the default connector to wrap a connection
+// to the database
+func (d *passwordConnector) Connect() (repo Repo, err error) {
+	d.db, err = bolt.Open(configs.STDConf.PasswordDatabasePath, 0744, nil)
+	if err != nil {
+		log.Fatal("Error opening database connection", err)
+	}
+	return &passwordRepo{db: d.db}, nil
+}
+
+func (d *passwordConnector) Disconnect() error {
 	return d.db.Close()
 }
