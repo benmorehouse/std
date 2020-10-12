@@ -16,12 +16,16 @@ type Repo interface {
 }
 
 // defaultRepo will implement the repo interface
-type defaultRepo struct {
+type listRepo struct {
+	db *bolt.DB
+}
+
+type passwordRepo struct {
 	db *bolt.DB
 }
 
 // List will list what is in the repo
-func (d *defaultRepo) List() (list []string) {
+func (d *listRepo) List() (list []string) {
 	d.db.Update(func(tx *bolt.Tx) error {
 		list = []string{}
 		cursor := tx.Cursor()
@@ -34,7 +38,7 @@ func (d *defaultRepo) List() (list []string) {
 }
 
 // Put will put whatever is in the repo
-func (d *defaultRepo) Put(bucketName, newValue string) error {
+func (d *listRepo) Put(bucketName, newValue string) error {
 	return d.db.Update(func(tx *bolt.Tx) (err error) {
 		bucket := tx.Bucket([]byte(bucketName))
 		if bucket == nil {
@@ -51,18 +55,75 @@ func (d *defaultRepo) Put(bucketName, newValue string) error {
 }
 
 // Remove will remove the bucket
-func (d *defaultRepo) Remove(key string) error {
+func (d *listRepo) Remove(key string) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(key))
 	})
 }
 
 // Get will go and get the value at the given key
-func (d *defaultRepo) Get(key string) (value string) {
+func (d *listRepo) Get(key string) (value string) {
 	d.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(key))
 		if bucket == nil {
 			return fmt.Errorf("bucket_not_found")
+		}
+		value = string(bucket.Get([]byte(key)))
+		return nil
+	})
+	return
+}
+
+// ############################################################
+// ###################### password repo #######################
+
+const passwordBucketKey = "password"
+
+// List will list what is in the repo
+func (d *passwordRepo) List() (list []string) {
+	return nil
+}
+
+// Put will put whatever is in the repo
+func (d *passwordRepo) Put(key, newValue string) error {
+	return d.db.Update(func(tx *bolt.Tx) (err error) {
+		bucket := tx.Bucket([]byte(passwordBucketKey))
+		if bucket == nil {
+			if bucket, err = tx.CreateBucketIfNotExists([]byte(passwordBucketKey)); err != nil {
+				return fmt.Errorf("unable_to_create_password_entry: %s", err.Error())
+			}
+		}
+
+		if err = bucket.Put([]byte(key), []byte(newValue)); err != nil {
+			return fmt.Errorf("unable_to_put_entry: %s", err.Error())
+		}
+		return nil
+	})
+}
+
+// Remove will remove the bucket
+func (d *passwordRepo) Remove(key string) error {
+	return d.db.Update(func(tx *bolt.Tx) (err error) {
+		bucket := tx.Bucket([]byte(passwordBucketKey))
+		if bucket == nil {
+			if bucket, err = tx.CreateBucketIfNotExists([]byte(passwordBucketKey)); err != nil {
+				return fmt.Errorf("unable_to_create_password_entry: %s", err.Error())
+			}
+		}
+
+		if err = bucket.Delete([]byte(key)); err != nil {
+			return fmt.Errorf("unable_to_delete_password: %s", err.Error())
+		}
+		return nil
+	})
+}
+
+// Get will go and get the value at the given key
+func (d *passwordRepo) Get(key string) (value string) {
+	d.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(passwordBucketKey))
+		if bucket == nil {
+			return fmt.Errorf("password_bucket_not_found")
 		}
 		value = string(bucket.Get([]byte(key)))
 		return nil

@@ -14,13 +14,12 @@ import (
 )
 
 type config struct {
-	DatabasePath   string `yaml:"database_path"`
-	TempWorkSpace  string `yaml:"temp_workspace"`
-	LogFile        string `yaml:"log_file"`
-	BufferMDFile   string `yaml:"buffer_md_file"`
-	VaultAddr      string `yaml:"vault_addr"`
-	VaultStaticKey string `yaml:"vault_static_key"`
-	dotFileConfig  string
+	ListDatabasePath     string `yaml:"list_database_path"`
+	PasswordDatabasePath string `yaml:"password_database_path"`
+	TempWorkSpace        string `yaml:"temp_workspace"`
+	LogFile              string `yaml:"log_file"`
+	BufferMDFile         string `yaml:"buffer_md_file"`
+	dotFileConfig        string
 }
 
 const (
@@ -31,16 +30,15 @@ const (
 )
 
 const (
-	testingConfigEnv      = "STD_CONFIG_TESTING"
-	baseDotfileDir        = ".std"
-	baseTestingDir        = ".testing"
-	defaultDatabasePath   = "db/mainDB.db"
-	defaultTempWorkSpace  = "tmp/"
-	defaultLogFile        = "logging/std.log"
-	defaultBufferMDFile   = "logging/stdin.buffer.md"
-	defaultVaultAddr      = ""
-	defaultVaultStaticKey = ""
-	dotFileConfig         = "config.yml"
+	testingConfigEnv            = "STD_CONFIG_TESTING"
+	baseDotfileDir              = ".std"
+	baseTestingDir              = ".testing"
+	defaultListDatabasePath     = "db/listDB.db"
+	defaultPasswordDatabasePath = "db/passwordDB.db"
+	defaultTempWorkSpace        = "tmp/"
+	defaultLogFile              = "logging/std.log"
+	defaultBufferMDFile         = "logging/stdin.buffer.md"
+	dotFileConfig               = "config.yml"
 )
 
 // STDConf embodies the set configurations for the application
@@ -49,7 +47,7 @@ var STDConf = &config{}
 var root string
 
 func init() {
-	if err := setConfigWithUserRoot(); err != nil {
+	if err := SetConfigWithUserRoot(); err != nil {
 		log.Fatal("couldn't set the necessary directory names", err)
 	}
 
@@ -62,7 +60,9 @@ func init() {
 	}
 }
 
-func setConfigWithUserRoot() error {
+// SetConfigWithUserRoot will set the configs again.
+// Run this when running tests
+func SetConfigWithUserRoot() error {
 	usr, err := userOS.Current()
 	if err != nil {
 		return err
@@ -76,10 +76,10 @@ func setConfigWithUserRoot() error {
 
 	STDConf.dotFileConfig = filepath.Join(root, dotFileConfig)
 	STDConf.BufferMDFile = filepath.Join(root, defaultBufferMDFile)
-	STDConf.DatabasePath = filepath.Join(root, defaultDatabasePath)
+	STDConf.ListDatabasePath = filepath.Join(root, defaultListDatabasePath)
+	STDConf.PasswordDatabasePath = filepath.Join(root, defaultPasswordDatabasePath)
 	STDConf.LogFile = filepath.Join(root, defaultLogFile)
 	STDConf.TempWorkSpace = filepath.Join(root, defaultTempWorkSpace)
-	STDConf.VaultAddr = defaultVaultAddr
 	return nil
 }
 
@@ -90,7 +90,10 @@ func makePaths() error {
 	if err := os.MkdirAll(filepath.Dir(STDConf.BufferMDFile), 0744); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(STDConf.DatabasePath), 0744); err != nil {
+	if err := os.MkdirAll(filepath.Dir(STDConf.ListDatabasePath), 0744); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(STDConf.PasswordDatabasePath), 0744); err != nil {
 		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(STDConf.LogFile), 0744); err != nil {
@@ -114,6 +117,7 @@ func loadDotfileConfig() error {
 	if err := yaml.Unmarshal(rawBytes, &STDConf); err != nil {
 		return fmt.Errorf("yaml_config_unmarshal: %s", err.Error())
 	}
+
 	return nil
 }
 

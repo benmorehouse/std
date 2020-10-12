@@ -16,7 +16,7 @@ var Command = &cobra.Command{
 	Short:   "create a list",
 	Example: "./std create work",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return process(repo.DefaultConnector(), utils.DefaultInteractor(), args)
+		return process(repo.ListConnector(), utils.DefaultInteractor(), args)
 	},
 }
 

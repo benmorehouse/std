@@ -36,6 +36,13 @@ help:
 	@echo 'clean - clean generated code and start from scratch'
 
 vault:
-	@echo 'installing hashicorp vault'
-	brew tap hashicorp/tap
-	brew install hashicorp/tap/vault
+	@echo 'installing and starting hashicorp vault for passwords'
+	ifeq (, $(shell which vault))
+	$(error "No vault CLI found in $(PATH)")
+	@echo "If I were you, and if you are using Homebrew as your default package manager"
+	@echo "I would run the following commands:"
+	@echo "\t brew tap hashicorp/tap"
+	@echo "\t brew install hashicorp/tap/vault"
+	endif 
+	@nohup vault server -config -dev-listen-address="127.0.0.1:8200"
+	@echo 'vault server started and ready to save your passwords!'

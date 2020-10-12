@@ -14,7 +14,7 @@ var Command = &cobra.Command{
 	Short:   "show all lists entered",
 	Example: "./std list",
 	Run: func(cmd *cobra.Command, args []string) {
-		process(repo.DefaultConnector(), args)
+		process(repo.ListConnector(), args)
 	},
 }
 
