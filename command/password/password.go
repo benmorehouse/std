@@ -1,7 +1,10 @@
 package password
 
 import (
+	"crypto/sha1"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/benmorehouse/std/repo"
 	"github.com/benmorehouse/std/utils"
@@ -27,14 +30,23 @@ var Command = &cobra.Command{
 			return process(repo.PasswordConnector(), utils.DefaultInteractor(), removeCLIKey)
 		}
 
-		return process(repo.PasswordConnector(), utils.DefaultInteractor(), getDefaultKey)
+		if viper.GetBool(getCLIKey) {
+			return process(repo.PasswordConnector(), utils.DefaultInteractor(), getCLIKey)
+		}
+
+		if viper.GetBool(generateHashKey) {
+			return process(repo.PasswordConnector(), utils.DefaultInteractor(), generateHashKey)
+		}
+
+		return cmd.Help()
 	},
 }
 
 const (
-	putCLIKey     = "put"
-	removeCLIKey  = "remove"
-	getDefaultKey = "get"
+	putCLIKey       = "put"
+	removeCLIKey    = "remove"
+	getCLIKey       = "get"
+	generateHashKey = "generate_password"
 )
 
 func process(connector repo.Connector, user utils.Interactor, userAction string) (err error) {
@@ -48,11 +60,14 @@ func process(connector repo.Connector, user utils.Interactor, userAction string)
 		return putPassword(db, user)
 	case removeCLIKey:
 		return removePassword(db, user)
-	default:
+	case getCLIKey:
 		return getPassword(db, user)
+	case generateHashKey:
+		return generatePasswordHash()
+	default:
+		return fmt.Errorf("user_action_not_recognized")
 	}
 }
-
 func removePassword(db repo.Repo, user utils.Interactor) error {
 	fmt.Print("Name of password:")
 	key := user.Input()
@@ -104,10 +119,35 @@ func getPassword(db repo.Repo, user utils.Interactor) error {
 	return nil
 }
 
+func generatePasswordHash() error {
+	rand.Seed(time.Now().UTC().UnixNano())
+	randString := randomString(32)
+	hash := sha1.New()
+	hash.Write([]byte(randString))
+	bs := hash.Sum(nil)
+
+	fmt.Printf("%x\n", bs)
+	return nil
+}
+
+var characterRunes = []rune("abcdefghipqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+func randomString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = characterRunes[rand.Intn(len(characterRunes))]
+	}
+	return string(b)
+}
+
 func init() {
 	Command.PersistentFlags().Bool(putCLIKey, false, "I want to put a password in")
 	Command.PersistentFlags().Bool(removeCLIKey, false, "I want to delete a password")
+	Command.PersistentFlags().Bool(generateHashKey, false, "I want to make a random hash")
+	Command.PersistentFlags().Bool(getCLIKey, false, "I want to get a password")
 
 	viper.BindPFlag(putCLIKey, Command.PersistentFlags().Lookup(putCLIKey))
+	viper.BindPFlag(getCLIKey, Command.PersistentFlags().Lookup(getCLIKey))
+	viper.BindPFlag(generateHashKey, Command.PersistentFlags().Lookup(generateHashKey))
 	viper.BindPFlag(removeCLIKey, Command.PersistentFlags().Lookup(removeCLIKey))
 }
