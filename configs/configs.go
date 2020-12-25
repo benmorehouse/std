@@ -50,14 +50,6 @@ func init() {
 	if err := SetConfigWithUserRoot(); err != nil {
 		log.Fatal("couldn't set the necessary directory names", err)
 	}
-
-	if err := makePaths(); err != nil {
-		log.Fatal("couldn't make the neccessary paths", err)
-	}
-
-	if err := loadDotfileConfig(); err != nil {
-		log.Fatal("Cannot load yaml config:", err)
-	}
 }
 
 // SetConfigWithUserRoot will set the configs again.
@@ -80,6 +72,14 @@ func SetConfigWithUserRoot() error {
 	STDConf.PasswordDatabasePath = filepath.Join(root, defaultPasswordDatabasePath)
 	STDConf.LogFile = filepath.Join(root, defaultLogFile)
 	STDConf.TempWorkSpace = filepath.Join(root, defaultTempWorkSpace)
+	if err := makePaths(); err != nil {
+		log.Fatal("couldn't make the neccessary paths", err)
+	}
+
+	if err := loadDotfileConfig(); err != nil {
+		log.Fatal("Cannot load yaml config:", err)
+	}
+
 	return nil
 }
 

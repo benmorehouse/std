@@ -74,7 +74,7 @@ var _ = Describe("Create Command", func() {
 			Expect(passwordRepo.Get(currentList)).To(Equal(stuffToDo))
 
 			// then list
-			Expect(passwordRepo.List()).To(BeNil())
+			Expect(passwordRepo.List()).ToNot(BeNil())
 
 			// then delete
 			Expect(passwordRepo.Remove(currentList)).ShouldNot(HaveOccurred())

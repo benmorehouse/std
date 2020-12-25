@@ -41,6 +41,16 @@ func DisplayBucketList(db repo.Repo) {
 	fmt.Print("______________________________\n\n")
 }
 
+// DisplayPasswordList displays passwords labeled and kept in
+func DisplayPasswordList(db repo.Repo) {
+	fmt.Print("\tAVAILABLE PASSWORDS\n______________________________\n\n")
+	for _, val := range db.List() {
+		fmt.Printf("- %s\n", val)
+	}
+	fmt.Print("______________________________\n\n")
+
+}
+
 // Edit will use vim to edit the given file
 func (i *iterm) Edit(filename string) error {
 	cmd := exec.Command("vim", "-o", filename)
