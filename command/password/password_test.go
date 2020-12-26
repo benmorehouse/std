@@ -58,6 +58,16 @@ var _ = Describe("Password Command", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
+
+		Context("when listing", func() {
+			It("list all given passwords", func() {
+				connectorMock.EXPECT().Connect().Return(vaultMock, nil)
+				vaultMock.EXPECT().List().Return([]string{})
+
+				err := process(connectorMock, userMock, "list")
+				Expect(err).ShouldNot(HaveOccurred())
+			})
+		})
 	})
 
 	Describe("When putting a password", func() {
@@ -169,7 +179,5 @@ var _ = Describe("Password Command", func() {
 				Expect(removePassword(vaultMock, userMock)).ShouldNot(HaveOccurred())
 			})
 		})
-
 	})
-
 })

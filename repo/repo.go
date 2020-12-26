@@ -26,7 +26,7 @@ type passwordRepo struct {
 
 // List will list what is in the repo
 func (d *listRepo) List() (list []string) {
-	d.db.Update(func(tx *bolt.Tx) error {
+	d.db.View(func(tx *bolt.Tx) error {
 		list = []string{}
 		cursor := tx.Cursor()
 		for name, _ := cursor.First(); name != nil; name, _ = cursor.Next() {
@@ -80,8 +80,23 @@ func (d *listRepo) Get(key string) (value string) {
 const passwordBucketKey = "password"
 
 // List will list what is in the repo
-func (d *passwordRepo) List() (list []string) {
-	return nil
+func (d *passwordRepo) List() []string {
+	list := []string{}
+	d.db.View(func(tx *bolt.Tx) (err error) {
+		bucket := tx.Bucket([]byte(passwordBucketKey))
+		if bucket == nil {
+			if bucket, err = tx.CreateBucketIfNotExists([]byte(passwordBucketKey)); err != nil {
+				return fmt.Errorf("unable_to_list_password_entry: %s", err.Error())
+			}
+		}
+
+		cursor := bucket.Cursor()
+		for name, _ := cursor.First(); name != nil; name, _ = cursor.Next() {
+			list = append(list, string(name))
+		}
+		return nil
+	})
+	return list
 }
 
 // Put will put whatever is in the repo
@@ -120,7 +135,7 @@ func (d *passwordRepo) Remove(key string) error {
 
 // Get will go and get the value at the given key
 func (d *passwordRepo) Get(key string) (value string) {
-	d.db.Update(func(tx *bolt.Tx) error {
+	d.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(passwordBucketKey))
 		if bucket == nil {
 			return fmt.Errorf("password_bucket_not_found")

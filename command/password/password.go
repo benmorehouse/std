@@ -18,24 +18,24 @@ var Command = &cobra.Command{
 	Short:   "Manage personal passwords",
 	Example: "./std password",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		fmt.Println("trying to see what's going on")
 		if viper.GetBool(putCLIKey) && viper.GetBool(removeCLIKey) {
 			return fmt.Errorf("please select either remove or put")
 		}
-
 		if viper.GetBool(putCLIKey) {
 			return process(repo.PasswordConnector(), utils.DefaultInteractor(), putCLIKey)
 		}
-
 		if viper.GetBool(removeCLIKey) {
 			return process(repo.PasswordConnector(), utils.DefaultInteractor(), removeCLIKey)
 		}
-
 		if viper.GetBool(getCLIKey) {
 			return process(repo.PasswordConnector(), utils.DefaultInteractor(), getCLIKey)
 		}
-
 		if viper.GetBool(generateHashKey) {
 			return process(repo.PasswordConnector(), utils.DefaultInteractor(), generateHashKey)
+		}
+		if viper.GetBool(listCLIKey) {
+			return process(repo.PasswordConnector(), utils.DefaultInteractor(), listCLIKey)
 		}
 
 		return cmd.Help()
@@ -47,7 +47,10 @@ const (
 	removeCLIKey    = "remove"
 	getCLIKey       = "get"
 	generateHashKey = "generate_password"
+	listCLIKey      = "list"
 )
+
+var characterRunes = []rune("abcdefghipqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 func process(connector repo.Connector, user utils.Interactor, userAction string) (err error) {
 	db, err := connector.Connect()
@@ -64,10 +67,14 @@ func process(connector repo.Connector, user utils.Interactor, userAction string)
 		return getPassword(db, user)
 	case generateHashKey:
 		return generatePasswordHash()
+	case listCLIKey:
+		utils.DisplayPasswordList(db)
+		return nil
 	default:
 		return fmt.Errorf("user_action_not_recognized")
 	}
 }
+
 func removePassword(db repo.Repo, user utils.Interactor) error {
 	fmt.Print("Name of password:")
 	key := user.Input()
@@ -130,8 +137,6 @@ func generatePasswordHash() error {
 	return nil
 }
 
-var characterRunes = []rune("abcdefghipqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
 func randomString(n int) string {
 	b := make([]rune, n)
 	for i := range b {
@@ -145,9 +150,11 @@ func init() {
 	Command.PersistentFlags().Bool(removeCLIKey, false, "I want to delete a password")
 	Command.PersistentFlags().Bool(generateHashKey, false, "I want to make a random hash")
 	Command.PersistentFlags().Bool(getCLIKey, false, "I want to get a password")
+	Command.PersistentFlags().Bool(listCLIKey, false, "I want to list my saved passwords")
 
 	viper.BindPFlag(putCLIKey, Command.PersistentFlags().Lookup(putCLIKey))
 	viper.BindPFlag(getCLIKey, Command.PersistentFlags().Lookup(getCLIKey))
 	viper.BindPFlag(generateHashKey, Command.PersistentFlags().Lookup(generateHashKey))
 	viper.BindPFlag(removeCLIKey, Command.PersistentFlags().Lookup(removeCLIKey))
+	viper.BindPFlag(listCLIKey, Command.PersistentFlags().Lookup(listCLIKey))
 }
