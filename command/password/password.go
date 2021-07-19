@@ -18,7 +18,6 @@ var Command = &cobra.Command{
 	Short:   "Manage personal passwords",
 	Example: "./std password",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("trying to see what's going on")
 		if viper.GetBool(putCLIKey) && viper.GetBool(removeCLIKey) {
 			return fmt.Errorf("please select either remove or put")
 		}
@@ -50,7 +49,7 @@ const (
 	listCLIKey      = "list"
 )
 
-var characterRunes = []rune("abcdefghipqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+var characterRunes = []rune("abcdefghipqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?#$()-_=+")
 
 func process(connector repo.Connector, user utils.Interactor, userAction string) (err error) {
 	db, err := connector.Connect()
